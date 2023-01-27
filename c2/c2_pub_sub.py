@@ -21,9 +21,14 @@ class C2PubSub(BaseMQTTPubSub):
     """
 
     FILE_INTERVAL = 10  # minutes
+    S3_INTERVAL = 15
 
     def __init__(
-        self: Any, next_file_topic: str, file_interval=FILE_INTERVAL, **kwargs: Any
+        self: Any,
+        c2_topic: str,
+        file_interval: int = FILE_INTERVAL,
+        s3_interval: int = S3_INTERVAL,
+        **kwargs: Any
     ) -> None:
         """The constructor of the C2PubSub class takes a topic name to broadcast
         to and an interval to broadcast to that topic at.
@@ -35,8 +40,9 @@ class C2PubSub(BaseMQTTPubSub):
             to write to a new file.Defaults to FILE_INTERVAL.
         """
         super().__init__(**kwargs)
-        self.next_file_topic = next_file_topic
+        self.c2_topic = c2_topic
         self.file_interval = file_interval
+        self.s3_interval = s3_interval
 
         self.connect_client()
         sleep(1)
@@ -51,8 +57,14 @@ class C2PubSub(BaseMQTTPubSub):
 
         schedule.every(self.file_interval).minutes.do(
             self.publish_to_topic,
-            topic_name=self.next_file_topic,
+            topic_name=self.c2_topic,
             publish_payload=json.dumps({"msg": "NEW FILE"}),
+        )
+        
+        schedule.every(self.s3_interval).minutes.do(
+            self.publish_to_topic,
+            topic_name=self.c2_topic,
+            publish_payload=json.dumps({"msg": "S3 SYNC"}),
         )
 
         while True:
@@ -65,7 +77,7 @@ class C2PubSub(BaseMQTTPubSub):
 
 if __name__ == "__main__":
     c2 = C2PubSub(
-        next_file_topic=os.environ.get("NEXT_FILE_TOPIC"),
+        c2_topic=os.environ.get("C2_TOPIC"),
         mqtt_ip=os.environ.get("MQTT_IP"),
     )
     c2.main()

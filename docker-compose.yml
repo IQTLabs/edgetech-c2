@@ -13,10 +13,10 @@ services:
     image: iqtlabs/edgetech-c2c:latest
     network_mode: "host"
     build:
-      context: ../edgetech-c2c/c2c
+      context: ./c2
       dockerfile: ./Dockerfile
     environment:
-      - NEXT_FILE_TOPIC=/AISonobuoy/<HOSTNAME>/C2C/edgetech-c2c/string
+      - C2_TOPIC=/AISonobuoy/<HOSTNAME>/C2C/edgetech-c2c/string
       - MQTT_IP=mqtt
     volumes:
       - /home/mobian/sensor-data:/sensor-data
