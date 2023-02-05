@@ -11,9 +11,6 @@ services:
     build:
       context: ./c2
       dockerfile: ./Dockerfile
-    environment:
-      - C2_TOPIC=${C2_TOPIC}
-      - MQTT_IP=${MQTT_IP}
     volumes:
       - /home/mobian/sensor-data:/sensor-data
     restart: unless-stopped
