@@ -5,21 +5,24 @@ services:
     ports:
       - "1883:1883"
       - "9001:9001"
-    build:
-      context: ./mqtt
-      dockerfile: ./Dockerfile
     restart: unless-stopped
-  c2c:
-    image: iqtlabs/edgetech-c2c:latest
-    network_mode: "host"
+  c2:
+    image: iqtlabs/edgetech-c2:latest
     build:
       context: ./c2
       dockerfile: ./Dockerfile
     environment:
-      - C2_TOPIC=/AISonobuoy/<HOSTNAME>/C2C/edgetech-c2c/string
+      - C2_TOPIC=/AISonobuoy/<HOSTNAME>/C2/edgetech-c2/string
       - MQTT_IP=mqtt
     volumes:
       - /home/mobian/sensor-data:/sensor-data
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "10"
     depends_on: 
       - mqtt
+    env_file:
+      - .env

@@ -20,13 +20,14 @@ class C2PubSub(BaseMQTTPubSub):
     """
 
     FILE_INTERVAL = 10  # minutes
-    S3_INTERVAL = 15 # minutes
+    S3_INTERVAL = 15  # minutes
 
     def __init__(
         self: Any,
         c2_topic: str,
         file_interval: int = FILE_INTERVAL,
         s3_interval: int = S3_INTERVAL,
+        debug: bool = False,
         **kwargs: Any
     ) -> None:
         """The constructor of the C2PubSub class takes a topic name to broadcast
@@ -39,10 +40,13 @@ class C2PubSub(BaseMQTTPubSub):
             to write to a new file.Defaults to FILE_INTERVAL.
         """
         super().__init__(**kwargs)
+        # initalize attributes
         self.c2_topic = c2_topic
         self.file_interval = file_interval
         self.s3_interval = s3_interval
+        self.debug = debug
 
+        # create MQTT client connection
         self.connect_client()
         sleep(1)
         self.publish_registration("C2 Registration")
@@ -52,14 +56,18 @@ class C2PubSub(BaseMQTTPubSub):
         connection alive and publishes the data to the MQTT broker every 10 minutes
         and keeps the main thread alive.
         """
+        # publish heartbeat to keep the TCP/IP connection alive
         schedule.every(10).seconds.do(self.publish_heartbeat, payload="C2 Heartbeat")
 
+        # every file interval, publish a message to broadcast to file
+        # saving nodes to change files
         schedule.every(self.file_interval).minutes.do(
             self.publish_to_topic,
             topic_name=self.c2_topic,
             publish_payload=json.dumps({"msg": "NEW FILE"}),
         )
 
+        # every s3 interval trigger a push of files up to the S3 bucket
         schedule.every(self.s3_interval).minutes.do(
             self.publish_to_topic,
             topic_name=self.c2_topic,
@@ -68,10 +76,13 @@ class C2PubSub(BaseMQTTPubSub):
 
         while True:
             try:
+                # flush pending scheduled tasks
                 schedule.run_pending()
+                # sleep to avoid running at CPU time
                 sleep(0.001)
-            except Exception as e:
-                print(e)
+            except KeyboardInterrupt as exception:
+                if self.debug:
+                    print(exception)
 
 
 if __name__ == "__main__":
