@@ -7,7 +7,6 @@ from time import sleep
 from typing import Any
 
 import schedule
-import paho.mqtt.client as mqtt
 
 from base_mqtt_pub_sub import BaseMQTTPubSub
 
@@ -21,7 +20,7 @@ class C2PubSub(BaseMQTTPubSub):
     """
 
     FILE_INTERVAL = 10  # minutes
-    S3_INTERVAL = 15
+    S3_INTERVAL = 15 # minutes
 
     def __init__(
         self: Any,
@@ -60,7 +59,7 @@ class C2PubSub(BaseMQTTPubSub):
             topic_name=self.c2_topic,
             publish_payload=json.dumps({"msg": "NEW FILE"}),
         )
-        
+
         schedule.every(self.s3_interval).minutes.do(
             self.publish_to_topic,
             topic_name=self.c2_topic,
@@ -77,7 +76,7 @@ class C2PubSub(BaseMQTTPubSub):
 
 if __name__ == "__main__":
     c2 = C2PubSub(
-        c2_topic=os.environ.get("C2_TOPIC"),
-        mqtt_ip=os.environ.get("MQTT_IP"),
+        c2_topic=str(os.environ.get("C2_TOPIC")),
+        mqtt_ip=str(os.environ.get("MQTT_IP")),
     )
     c2.main()
