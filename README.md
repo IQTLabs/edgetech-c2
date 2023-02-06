@@ -78,6 +78,11 @@ flowchart TD
     mqtt{MQTT} -- Subscribed to C2 Topic --> filesaver(Filesaver)
     mqtt{MQTT} -- Subscribed to C2 Topic --> s3uploader(S3 Uploader)
 
+style mqtt fill:#0072bc,color:#ffffff
+style s3uploader fill:#F9D308,color:#ffffff
+style filesaver fill:#F9D308,color:#ffffff
+style c2 fill:#f05343,color:#ffffff
+
 ```
 
 ## Roadmap
