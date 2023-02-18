@@ -1,5 +1,5 @@
 """This file includes a command and control module to direct and coordinate
-differnt services using MQTT.
+different services using MQTT.
 """
 import os
 import json
@@ -13,7 +13,7 @@ from base_mqtt_pub_sub import BaseMQTTPubSub
 
 class C2PubSub(BaseMQTTPubSub):
     """The C2PubSub is a class that wraps command and control functionalities. Currently,
-    this is limitied to broadcasting to nodes to write to a new file.
+    this is limited to broadcasting to nodes to write to a new file.
 
     Args:
         BaseMQTTPubSub (BaseMQTTPubSub): parent class written in the EdgeTech Core module
@@ -34,13 +34,13 @@ class C2PubSub(BaseMQTTPubSub):
         to and an interval to broadcast to that topic at.
 
         Args:
-            next_file_topic (str): The MQTT topic to broadcast a paylod that changes
+            next_file_topic (str): The MQTT topic to broadcast a payload that changes
             the file at a given interval.
             file_interval (int): The number of minutes before C2 broadcasts a message
             to write to a new file.Defaults to FILE_INTERVAL.
         """
         super().__init__(**kwargs)
-        # initalize attributes
+        # initialize attributes
         self.c2_topic = c2_topic
         self.file_interval = file_interval
         self.s3_interval = s3_interval
